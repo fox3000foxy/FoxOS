@@ -1,0 +1,170 @@
+<head>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+var socket = io()
+<!-- socket.emit("app",{app:"explorer"}) -->
+</script>
+<style>
+.icon {
+    -webkit-padding-start: 1.5em;
+    text-decoration: none;
+	width : 150px;
+	border:1px solid transparent
+}
+.folder {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAd5JREFUeNqMU79rFUEQ/vbuodFEEkzAImBpkUabFP4ldpaJhZXYm/RiZWsv/hkWFglBUyTIgyAIIfgIRjHv3r39MePM7N3LcbxAFvZ2b2bn22/mm3XMjF+HL3YW7q28YSIw8mBKoBihhhgCsoORot9d3/ywg3YowMXwNde/PzGnk2vn6PitrT+/PGeNaecg4+qNY3D43vy16A5wDDd4Aqg/ngmrjl/GoN0U5V1QquHQG3q+TPDVhVwyBffcmQGJmSVfyZk7R3SngI4JKfwDJ2+05zIg8gbiereTZRHhJ5KCMOwDFLjhoBTn2g0ghagfKeIYJDPFyibJVBtTREwq60SpYvh5++PpwatHsxSm9QRLSQpEVSd7/TYJUb49TX7gztpjjEffnoVw66+Ytovs14Yp7HaKmUXeX9rKUoMoLNW3srqI5fWn8JejrVkK0QcrkFLOgS39yoKUQe292WJ1guUHG8K2o8K00oO1BTvXoW4yasclUTgZYJY9aFNfAThX5CZRmczAV52oAPoupHhWRIUUAOoyUIlYVaAa/VbLbyiZUiyFbjQFNwiZQSGl4IDy9sO5Wrty0QLKhdZPxmgGcDo8ejn+c/6eiK9poz15Kw7Dr/vN/z6W7q++091/AQYA5mZ8GYJ9K0AAAAAASUVORK5CYII= ) left top no-repeat;
+}
+
+.file {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAABnRSTlMAAAAAAABupgeRAAABHUlEQVR42o2RMW7DIBiF3498iHRJD5JKHurL+CRVBp+i2T16tTynF2gO0KSb5ZrBBl4HHDBuK/WXACH4eO9/CAAAbdvijzLGNE1TVZXfZuHg6XCAQESAZXbOKaXO57eiKG6ft9PrKQIkCQqFoIiQFBGlFIB5nvM8t9aOX2Nd18oDzjnPgCDpn/BH4zh2XZdlWVmWiUK4IgCBoFMUz9eP6zRN75cLgEQhcmTQIbl72O0f9865qLAAsURAAgKBJKEtgLXWvyjLuFsThCSstb8rBCaAQhDYWgIZ7myM+TUBjDHrHlZcbMYYk34cN0YSLcgS+wL0fe9TXDMbY33fR2AYBvyQ8L0Gk8MwREBrTfKe4TpTzwhArXWi8HI84h/1DfwI5mhxJamFAAAAAElFTkSuQmCC) left top no-repeat;
+}
+
+.up {
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAmlJREFUeNpsU0toU0EUPfPysx/tTxuDH9SCWhUDooIbd7oRUUTMouqi2iIoCO6lceHWhegy4EJFinWjrlQUpVm0IIoFpVDEIthm0dpikpf3ZuZ6Z94nrXhhMjM3c8895977BBHB2PznK8WPtDgyWH5q77cPH8PpdXuhpQT4ifR9u5sfJb1bmw6VivahATDrxcRZ2njfoaMv+2j7mLDn93MPiNRMvGbL18L9IpF8h9/TN+EYkMffSiOXJ5+hkD+PdqcLpICWHOHc2CC+LEyA/K+cKQMnlQHJX8wqYG3MAJy88Wa4OLDvEqAEOpJd0LxHIMdHBziowSwVlF8D6QaicK01krw/JynwcKoEwZczewroTvZirlKJs5CqQ5CG8pb57FnJUA0LYCXMX5fibd+p8LWDDemcPZbzQyjvH+Ki1TlIciElA7ghwLKV4kRZstt2sANWRjYTAGzuP2hXZFpJ/GsxgGJ0ox1aoFWsDXyyxqCs26+ydmagFN/rRjymJ1898bzGzmQE0HCZpmk5A0RFIv8Pn0WYPsiu6t/Rsj6PauVTwffTSzGAGZhUG2F06hEc9ibS7OPMNp6ErYFlKavo7MkhmTqCxZ/jwzGA9Hx82H2BZSw1NTN9Gx8ycHkajU/7M+jInsDC7DiaEmo1bNl1AMr9ASFgqVu9MCTIzoGUimXVAnnaN0PdBBDCCYbEtMk6wkpQwIG0sn0PQIUF4GsTwLSIFKNqF6DVrQq+IWVrQDxAYQC/1SsYOI4pOxKZrfifiUSbDUisif7XlpGIPufXd/uvdvZm760M0no1FZcnrzUdjw7au3vu/BVgAFLXeuTxhTXVAAAAAElFTkSuQmCC) left top no-repeat;
+}
+
+* {
+ user-select: none;
+}
+
+#menu {
+	background-color: lightgray;
+	border:1px solid gray;
+	padding:5px;
+}
+
+.overlayable:hover {
+background: #A3A3A3
+}
+</style>
+<link rel="stylesheet" href="?config=dialog.css">
+<script src="?script=dialog.js"></script>
+<script>
+function readDir(dir){
+	fetch(location.origin+"/?files="+dir)
+	.then((res)=>{return res.json()})
+	.then((res)=>{
+		if(res.indexOf("documents")==-1) showHTML(['..',...res])
+		else showHTML(res)
+	})
+}
+
+function showHTML(files){
+	document.body.innerHTML = ""
+	filechoice = location.search.indexOf('filechoice')!=-1?true:false
+	if(filechoice==true){document.body.innerHTML += "Please select your file..."}
+	files.forEach((file,i)=>{
+		if (file=="°°°°°") return
+		if(file=="..") document.body.innerHTML += "<div class='icon up' id='file"+i+"' ondblclick='goDir(this.innerText)' onclick='setBluebox(this)' oncontextmenu='event.preventDefault()'>"+file+"<\/div>"
+		else if(file.startsWith(".") || file == "node_modules") return
+		else if (i<files.indexOf("°°°°°")) document.body.innerHTML += "<div class='icon folder' id='file"+i+"' onclick='setBluebox(this)' ondblclick='goDir(this.innerText)' oncontextmenu='contextMenu(this,\"folder\")'>"+file+"<\/div>"
+		else document.body.innerHTML += "<div  class='icon file'  id='file"+i+"' onclick='setBluebox(this)' ondblclick='"+(filechoice==true?"selectFile":"openFile")+"(this.innerText)' oncontextmenu='contextMenu(this,\"file\")'>"+file+"<\/div>"
+	})
+	document.body.innerHTML += '<div id="menu" style="visibility:hidden;position:absolute;width:150px;left:0;top:0"><\/div>'
+	document.body.style = "background-color:#FEFEFE"
+	document.body.innerHTML += `
+	<div id="dialogoverlay"></div>
+	<div id="dialogbox">
+	  <div>
+		<div id="dialogboxhead"></div>
+		<div id="dialogboxbody"></div>
+		<div id="dialogboxfoot"></div>
+	  </div>
+	</div>
+	`
+}
+setBluebox = (elem)=>{
+	resetBluebox()
+	elem.setAttribute('style','background-color:rgba(0,0,255,0.4);border:1px solid lightblue')
+}
+
+selected=0
+
+function contextMenu(elem,type){
+	if(selected==1) return
+	selected = 1
+	setTimeout(()=>{selected=0},10)
+	menu = document.getElementById('menu')
+	
+	<!-- console.log("Right-Clic") -->
+	if(type=="file") {
+		options = [
+		<!-- {value:"Open",color:"red",action:()=>{openFile(elem.innerText)}} -->
+		<!-- HERE -->
+			{value:"Delete",color:"red",action:`
+			<!-- console.log("${dir}"); -->
+			socket.emit("deleteFile","${dir}${elem.innerText}");
+			readDir("${dir}")
+			`}
+		]
+	}
+	if(type=="folder") {
+		options = [
+			{value:"Delete",color:"red",action:`
+			<!-- console.log("${dir}"); -->
+			socket.emit("deleteFolder","${dir}${elem.innerText}");
+			readDir("${dir}")
+			`}
+		]
+	}
+	if(type=="subroot") {
+			<!-- Prompt.render('Type the name of the folder you want to create:','createFolder'); -->
+		options = [
+			{value:"Create folder",color:"black",action:'Prompt.render("Type the name of the folder you want to create :","createFolder")'},
+			{value:"Create file",color:"black",action:'Prompt.render("Type the name of the file you want to create :","createFile")'}
+		]
+	}
+	menu.innerHTML = ""
+	options.forEach((option)=>{
+		menu.innerHTML += "<span class='overlayable' style='color:"+option.color+"' onclick='"+option.action+"'>"+option.value+"</span><br>"
+	})
+	menu.style.left = event.clientX+"px"
+	menu.style.top = event.clientY+"px"
+	menu.style.visibility = "visible"
+	event.preventDefault()
+}
+
+function createFile(name){
+socket.emit("createFile",dir+name)
+readDir(dir)
+}
+
+function createFolder(name){
+socket.emit("createFolder",dir+name)
+readDir(dir)
+}
+
+function hideMenu(){
+	<!-- console.log("hidin") -->
+	menu.style.visibility = "hidden"
+}
+
+function goDir(directory){
+	dir += directory+"/";
+	readDir(dir)
+}
+
+function openFile(file){
+parent.openApp("notepad","file="+dir+file)
+}
+
+function selectFile(file){
+socket.emit("fileChoiced",dir+file)
+parent.document.getElementById(window.name).parentElement.remove();
+}
+
+if (location.search.indexOf("path=")!=-1)
+	dir = location.search.split("path=")[1]
+else
+	dir = './filesystem/'
+readDir(dir)
+function resetBluebox(){
+	[...document.getElementsByClassName('icon')].forEach((box)=>{
+		box.style=''
+	})
+}
+</script>
+</head>
+<div id="menu" style="visibility:hidden;position:absolute;width:150px;left:0;top:0"></div>
+<body onclick="hideMenu()" oncontextmenu="contextMenu(this,'subroot')">
+</body>

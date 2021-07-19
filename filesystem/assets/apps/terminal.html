@@ -1,0 +1,44 @@
+<style>
+body, #line {
+	background-color:black;
+	color:white;
+	font-family:consolas;
+	font-size:16px
+}
+
+::selection {
+	background-color: white;
+	<!-- color: black; -->
+}
+</style>
+<body onkeydown="
+//console.log(event.keyCode)
+event.preventDefault()
+if (event.keyCode==13) sendCommand(command)
+if (event.keyCode==8) {command = command.substr(0,command.length - 1)}
+else {command += event.key.length==1?event.key:''}
+	document.getElementById('path').innerHTML = path + command
+">
+<div id="console">Console of FoxOs: version 1.0.0<br></div>
+<div id="path"></div>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+var socket = io()
+socket.emit("dirName")
+socket.on('dirName',(name)=>{
+	path = name+">"
+	command = ""
+	document.getElementById('path').innerHTML = path
+	sendCommand = (command)=>{socket.emit('cmd',command)}
+})
+<!-- path = "os:\\system\\> " -->
+
+socket.on('stdout',(stdout)=>{
+	if (stdout==null) stdout = ""
+	document.getElementById('console').innerHTML += document.getElementById("path").innerHTML+"<br>"+stdout+"<br><br>"
+	<!-- socket.emit("dirName") -->
+	document.getElementById('path').innerHTML = path
+	command=''
+})
+</script>

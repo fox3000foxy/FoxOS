@@ -1,0 +1,69 @@
+<script src="/socket.io/socket.io.js"></script>
+
+<body>
+<div id="menu" style="
+position:absolute;
+left:0px;
+top:0px;
+width:100%;
+height:22.5px;
+background-color:white;
+border-bottom:1px solid gray;
+">
+<button style="margin: 0 5px;position:relative;top:1px;border:1px solid transparent;background-color:transparent" onclick="parent.openApp('explorer','filechoice');waiting=1;openMode=1">Open</button>
+<!-- <input hidden type="file" id="openFile"> -->
+<button style="margin: 0 5px;position:relative;top:1px;border:1px solid transparent;background-color:transparent" onclick="save()">Save</button>
+</div>
+<textarea id="editArea" style="
+position:absolute;
+left:0;
+top:23.5px;
+width:100%;
+border:none;
+resize:none
+">
+</textarea>
+</body>
+<script>
+	var socket = io()
+	
+	waiting = 0
+	openMode = 0
+	socket.on('fileChoiced',(file)=>{
+		if (waiting!=1) return
+		if (openMode==1){
+			socket.emit("readFile",file)
+			socket.on('fileRead',(data)=>{
+				fileDisplayArea.innerHTML = data
+			})
+		}
+		location.hash = "#file="+file
+		if(openMode==2) save()
+		waiting = 0
+		openMode = 0
+	})
+	
+	var fileInput = document.getElementById('openFile');
+	var fileDisplayArea = document.getElementById('editArea');
+	if(location.search.indexOf('file=')!=-1)
+	{
+		socket.emit("readFile",location.search.split("file=")[1])
+		socket.on('fileRead',(data)=>{
+			fileDisplayArea.innerHTML = data
+		})
+	}
+	
+	function save() {
+		if (location.href.indexOf('file=')==-1) {
+			openMode=2
+			parent.openApp('explorer','filechoice');waiting=1
+			return
+		}
+		file = location.href.split("file=")[1]
+		socket.emit('saveFile',{path:file,data:fileDisplayArea.value})
+	}
+	
+	setInterval(()=>{
+		document.getElementById("editArea").style.height = window.innerHeight - 23.5
+	})
+</script>
